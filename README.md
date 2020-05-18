@@ -1,6 +1,6 @@
 # speech_recognition
 
-A flutter plugin to use the speech recognition iOS10+ / Android 4.1+
+A flutter plugin to use the speech recognition iOS10+ / Android 4.1+ that is based on [Rxlabz](https://github.com/rxlabz/speech_recognition)
 
 - [Basic Example](https://github.com/rxlabz/speech_recognition/tree/master/example)
 - [Sytody, speech to todo app](https://github.com/rxlabz/sytody)
