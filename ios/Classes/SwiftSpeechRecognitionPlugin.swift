@@ -15,6 +15,10 @@ public class SwiftSpeechRecognitionPlugin: NSObject, FlutterPlugin, SFSpeechReco
   private let speechRecognizerRu = SFSpeechRecognizer(locale: Locale(identifier: "ru_RU"))!
   private let speechRecognizerIt = SFSpeechRecognizer(locale: Locale(identifier: "it_IT"))!
   private let speechRecognizerEs = SFSpeechRecognizer(locale: Locale(identifier: "es_ES"))!
+  private let speechRecognizerVi = SFSpeechRecognizer(locale: Locale(identifier: "vi_VN"))!
+  private let speechRecognizerCn = SFSpeechRecognizer(locale: Locale(identifier: "zh_CN"))!
+  private let speechRecognizerHk = SFSpeechRecognizer(locale: Locale(identifier: "zh_HK"))!
+  private let speechRecognizerTw = SFSpeechRecognizer(locale: Locale(identifier: "zh_TW"))!
 
   private var speechChannel: FlutterMethodChannel?
 
@@ -51,6 +55,11 @@ public class SwiftSpeechRecognitionPlugin: NSObject, FlutterPlugin, SFSpeechReco
     speechRecognizerRu.delegate = self
     speechRecognizerIt.delegate = self
     speechRecognizerEs.delegate = self
+    speechRecognizerVi.delegate = self
+    speechRecognizerCn.delegate = self
+    speechRecognizerHk.delegate = self
+    speechRecognizerTw.delegate = self
+
 
     SFSpeechRecognizer.requestAuthorization { authStatus in
       OperationQueue.main.addOperation {
@@ -171,6 +180,14 @@ public class SwiftSpeechRecognitionPlugin: NSObject, FlutterPlugin, SFSpeechReco
       return speechRecognizerIt
     case "es_ES":
         return speechRecognizerEs
+    case "vi_VN":
+        return speechRecognizerVi
+    case "zh_CN":
+        return speechRecognizerCn
+    case "zh_TW":
+        return speechRecognizerTw
+    case "zh_HK":
+        return speechRecognizerHk
     default:
       return speechRecognizerFr
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_permissions/simple_permissions.dart';
 import 'package:speech_recognition/speech_recognition.dart';
 
 void main() {
@@ -6,11 +7,15 @@ void main() {
 }
 
 const languages = const [
-  const Language('Francais', 'fr_FR'),
   const Language('English', 'en_US'),
+  const Language('Francais', 'fr_FR'),
   const Language('Pусский', 'ru_RU'),
   const Language('Italiano', 'it_IT'),
   const Language('Español', 'es_ES'),
+  const Language('Vietnamese', 'vi_VN'),
+  const Language('Chinese China', 'zh_CN'),
+  const Language('Chinese Taiwan', 'zh_TW'),
+  const Language('Chinese Hongkong', 'zh_HK')
 ];
 
 class Language {
@@ -39,11 +44,21 @@ class _MyAppState extends State<MyApp> {
   @override
   initState() {
     super.initState();
-    activateSpeechRecognizer();
+    _checkAudioPermission();
+    _activateSpeechRecognizer();
+  }
+
+  void _checkAudioPermission() async {
+    SimplePermissions.checkPermission(Permission.RecordAudio)
+        .then((hasPermission) {
+      if (!hasPermission) {
+        SimplePermissions.requestPermission(Permission.RecordAudio);
+      }
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  void activateSpeechRecognizer() {
+  void _activateSpeechRecognizer() {
     print('_MyAppState.activateSpeechRecognizer... ');
     _speech = new SpeechRecognition();
     _speech.setAvailabilityHandler(onSpeechAvailability);
@@ -84,7 +99,7 @@ class _MyAppState extends State<MyApp> {
                           child: new Text(transcription))),
                   _buildButton(
                     onPressed: _speechRecognitionAvailable && !_isListening
-                        ? () => start()
+                        ? () => _startRecognise()
                         : null,
                     label: _isListening
                         ? 'Listening...'
@@ -98,6 +113,10 @@ class _MyAppState extends State<MyApp> {
                     onPressed: _isListening ? () => stop() : null,
                     label: 'Stop',
                   ),
+                  _buildButton(
+                    onPressed: _isListening || transcription.length == 0? null : () => setState(() => transcription = ''),
+                    label: 'Clear',
+                  )
                 ],
               ),
             )),
@@ -128,7 +147,7 @@ class _MyAppState extends State<MyApp> {
         ),
       ));
 
-  void start() => _speech
+  void _startRecognise() => _speech
       .listen(locale: selectedLang.code)
       .then((result) => print('_MyAppState.start => result $result'));
 
@@ -152,7 +171,8 @@ class _MyAppState extends State<MyApp> {
 
   void onRecognitionResult(String text) => setState(() => transcription = text);
 
-  void onRecognitionComplete(String text) => setState(() => _isListening = false);
+  void onRecognitionComplete(String text) =>
+      setState(() => _isListening = false);
 
-  void errorHandler() => activateSpeechRecognizer();
+  void errorHandler() => _activateSpeechRecognizer();
 }
