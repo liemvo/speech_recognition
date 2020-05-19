@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_permissions/simple_permissions.dart';
 import 'package:speech_recognition/speech_recognition.dart';
 
 void main() {
@@ -43,11 +44,21 @@ class _MyAppState extends State<MyApp> {
   @override
   initState() {
     super.initState();
-    activateSpeechRecognizer();
+    _checkAudioPermission();
+    _activateSpeechRecognizer();
+  }
+
+  void _checkAudioPermission() async {
+    SimplePermissions.checkPermission(Permission.RecordAudio)
+        .then((hasPermission) {
+      if (!hasPermission) {
+        SimplePermissions.requestPermission(Permission.RecordAudio);
+      }
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  void activateSpeechRecognizer() {
+  void _activateSpeechRecognizer() {
     print('_MyAppState.activateSpeechRecognizer... ');
     _speech = new SpeechRecognition();
     _speech.setAvailabilityHandler(onSpeechAvailability);
@@ -88,7 +99,7 @@ class _MyAppState extends State<MyApp> {
                           child: new Text(transcription))),
                   _buildButton(
                     onPressed: _speechRecognitionAvailable && !_isListening
-                        ? () => start()
+                        ? () => _startRecognise()
                         : null,
                     label: _isListening
                         ? 'Listening...'
@@ -136,7 +147,7 @@ class _MyAppState extends State<MyApp> {
         ),
       ));
 
-  void start() => _speech
+  void _startRecognise() => _speech
       .listen(locale: selectedLang.code)
       .then((result) => print('_MyAppState.start => result $result'));
 
@@ -163,5 +174,5 @@ class _MyAppState extends State<MyApp> {
   void onRecognitionComplete(String text) =>
       setState(() => _isListening = false);
 
-  void errorHandler() => activateSpeechRecognizer();
+  void errorHandler() => _activateSpeechRecognizer();
 }
